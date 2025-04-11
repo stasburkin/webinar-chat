@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Framer Webinar Chat</title>
+    <style>
+      body { font-family: sans-serif; padding: 10px; background: #f9f9f9; }
+      #messages { height: 300px; overflow-y: scroll; border: 1px solid #ccc; background: #fff; padding: 10px; margin-bottom: 10px; border-radius: 8px; }
+      input, button { padding: 8px; margin-right: 5px; border-radius: 6px; border: 1px solid #ccc; }
+    </style>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
+  </head>
+  <body>
+    <h3>Чат вебинара</h3>
+    <div id="messages"></div>
+    <input type="text" id="name" placeholder="Ваше имя" />
+    <input type="text" id="message" placeholder="Сообщение..." />
+    <button onclick="sendMessage()">Отправить</button>
+
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyCdZb8icLW_ZtdL3JGbfetXYArXKLFJEtA",
+        authDomain: "project-a9fb2.firebaseapp.com",
+        databaseURL: "https://project-a9fb2-default-rtdb.firebaseio.com",
+        projectId: "project-a9fb2",
+        storageBucket: "project-a9fb2.appspot.com",
+        messagingSenderId: "7252222513020",
+        appId: "1:7252222513020:web:b607772a1d061de317acf9",
+        measurementId: "G-9M33S0F0VB"
+      };
+
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.database();
+
+      firebase.auth().signInAnonymously().catch(console.error);
+
+      const messagesRef = db.ref("messages");
+
+      messagesRef.on("child_added", (snapshot) => {
+        const data = snapshot.val();
+        const el = document.createElement("div");
+        el.textContent = `${data.name}: ${data.text}`;
+        document.getElementById("messages").appendChild(el);
+        document.getElementById("messages").scrollTop = document.getElementById("messages").scrollHeight;
+      });
+
+      function sendMessage() {
+        const name = document.getElementById("name").value.trim();
+        const text = document.getElementById("message").value.trim();
+        if (name && text) {
+          messagesRef.push({ name, text });
+          document.getElementById("message").value = "";
+        }
+      }
+    </script>
+  </body>
+</html>
